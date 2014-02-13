@@ -2,6 +2,8 @@
 
 return array(
 
+	'api_key' => 'saag43tdsf084Ffhsd0of4w3fn4fFFSE',
+
 	/*
 	|--------------------------------------------------------------------------
 	| Application Debug Mode

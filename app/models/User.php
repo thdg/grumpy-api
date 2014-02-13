@@ -13,11 +13,18 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	protected $table = 'users';
 
 	/**
+	 * The attributes that can be mass assigned.
+	 *
+	 * @var string
+	 */
+	protected $fillable = array('username', 'email', 'password');
+
+	/**
 	 * The attributes excluded from the model's JSON form.
 	 *
 	 * @var array
 	 */
-	protected $hidden = array('password','salt');
+	protected $hidden = array('password');
 
 	/**
 	 * Get the unique identifier for the user.
@@ -37,16 +44,6 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	public function getAuthPassword()
 	{
 		return $this->password;
-	}
-
-	/**
-	 * Get the salt for the user.
-	 *
-	 * @return string
-	 */
-	public function getSalt()
-	{
-		return $this->salt;
 	}
 
 	/**

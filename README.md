@@ -7,7 +7,8 @@ JSON API fyrir Grumpy
 Notkun
 ------
 
-TODO: bæta við access_token ef þess þarf þar sem það á við
+TODO: bæta við access_token þar sem það á við
+TODO: bæta við api_key
 
 Login:
 
@@ -18,8 +19,7 @@ Notendur:
 
     GET  /user/ -> Listi yfir alla notendur sem passa við query (q, start=0, count=10)
     POST /user/ -> búa til nýjan notanda
-    PUT  /user/ -> uppfæra notanda
-    
+    PUT  /user/<user_id>/ -> uppfæra notanda 
     GET  /user/<user_id>/ -> Upplýsingar um notanda með auðkennið user_id
     GET  /user/exists/?username=<name> -> True ef notandanafn er í tekið annars False
     
@@ -30,4 +30,10 @@ Tuð:
     PUT  /post/ -> uppfæra tuð
     
     GET  /post/<post_id>/ -> Upplýsingar um tuð með auðkennið post_id
+
+Tengingar:
+
+    POST /follow/<user_id>/ -> Followa user með aukenni user_id
+    GET  /follow/<user_id>/ -> Listi yfir þá sem eru að followa user með auðkenni user_id
+
     

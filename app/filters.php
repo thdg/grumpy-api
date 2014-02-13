@@ -13,7 +13,12 @@
 
 App::before(function($request)
 {
-	//
+	// TODO: log - later!
+	// this is a great place to log requests, every request goes through here
+
+	$api_key = Input::get('api_key');
+	if ($api_key != Config::get('app.api_key')) return Redirect::to('500');
+
 });
 
 
@@ -32,6 +37,17 @@ App::after(function($request, $response)
 | integrates HTTP Basic authentication for quick, simple checking.
 |
 */
+
+Route::filter('token', function()
+{
+	$access_token = Input::get('access_token');
+
+	// if laravel is running in debug mode you can always pass nonono as access token
+	if (Config::get('app.debug') && $access_token=="nonono") return;
+
+	$token = Token::where('key', $access_token)->get();
+	if ($token->isExpired() || !$token->isActive()) return Redirect::to('500');
+});
 
 Route::filter('auth', function()
 {

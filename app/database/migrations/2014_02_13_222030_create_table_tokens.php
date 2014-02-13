@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTablePosts extends Migration {
+class CreateTableTokens extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -12,13 +12,16 @@ class CreateTablePosts extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('posts', function(Blueprint $table)
+		Schema::create('tokens', function(Blueprint $table)
 		{
 			$table->increments('id');
 			$table->timestamps();
 
-			$table->integer('creator')->unsigned()->foreign()->references('id')->on('users');
-			$table->string('post');
+			$table->integer('user')->unsigned()->foreign()->references('id')->on('users');
+
+			$table->string('key')->unique();
+			$table->boolean('active')->default(true);
+			$table->datetime('expire_date');
 		});
 	}
 
@@ -29,7 +32,7 @@ class CreateTablePosts extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('posts');
+		Schema::drop('tokens');
 	}
 
 }
