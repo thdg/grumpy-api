@@ -11,6 +11,8 @@
 |
 */
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+
 App::before(function($request)
 {
 	// TODO: log - later!
@@ -95,4 +97,10 @@ Route::filter('csrf', function()
 	{
 		throw new Illuminate\Session\TokenMismatchException;
 	}
+});
+
+App::error(function(ModelNotFoundException $e)
+{
+	//TODO: Return json here
+    return Response::make('Not Found', 404);
 });

@@ -15,5 +15,4 @@ class Post extends Eloquent {
 	 * @var string
 	 */
 	protected $fillable = array('creator', 'post');
-
 }

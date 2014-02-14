@@ -27,6 +27,17 @@ Route::get('/user/{user_id}/', function($user_id)
 	return User::find($user_id);
 });
 
+Route::get('/userexists/{username}/', function($username)
+{
+	$userCount = User::where('username', '=' , $username)->count();
+
+	//TODO: Look into making this response more general
+	if ($userCount > 0)
+		return Response::json(array('user_available' => false));
+	else
+		return Response::json(array("user_available" => true));
+});
+
 Route::post('/user/', function()
 {
 	if (Input::has('username') && Input::has('password'))
