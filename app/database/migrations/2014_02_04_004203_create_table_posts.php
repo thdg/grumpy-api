@@ -17,7 +17,7 @@ class CreateTablePosts extends Migration {
 			$table->increments('id');
 			$table->timestamps();
 
-			$table->integer('creator')->unsigned()->foreign()->references('id')->on('users');
+			$table->integer('user_id')->unsigned()->foreign()->references('id')->on('users');
 			$table->string('post');
 		});
 	}

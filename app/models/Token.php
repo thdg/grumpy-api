@@ -14,20 +14,21 @@ class Token extends Eloquent {
 	 *
 	 * @var string
 	 */
-	protected $fillable = array('user', 'expire_date', 'key', 'active');
+	protected $fillable = array('user_id', 'expire_date', 'key', 'active');
 
 	/**
 	 * The attributes excluded from the model's JSON form.
 	 *
 	 * @var array
 	 */
-	protected $hidden = array('key');
+	protected $hidden = array('*'); // This should never get out!
+
 	/**
 	 * Get the access_token.
 	 *
 	 * @return string
 	 */
-	public function getKey()
+	public function getToken()
 	{
 		return $this->key;
 	}
@@ -65,4 +66,8 @@ class Token extends Eloquent {
 		$this->save();
 	}
 
+	public function user()
+	{
+		return $this->belongsTo('user');
+	}
 }

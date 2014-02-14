@@ -10,9 +10,21 @@ class Post extends Eloquent {
 	protected $table = 'posts';
 
 	/**
+	 * The attributes excluded from the model's JSON form.
+	 *
+	 * @var array
+	 */
+	protected $hidden = array('user_id');
+
+	/**
 	 * The attributes that can be mass assigned.
 	 *
 	 * @var string
 	 */
-	protected $fillable = array('creator', 'post');
+	protected $fillable = array('user_id', 'post');
+
+	public function user()
+	{
+		return $this->belongsTo('user');
+	}
 }

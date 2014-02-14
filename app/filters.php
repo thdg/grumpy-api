@@ -21,8 +21,8 @@ App::before(function($request)
 	if (Config::get('app.debug')) return;
 
 	$api_key = Input::get('api_key');
-	if ($api_key != Config::get('app.api_key')) return Redirect::to('500');
-
+	if ($api_key != Config::get('app.api_key')) 
+		return Response::error('403');
 });
 
 
@@ -46,11 +46,9 @@ Route::filter('token', function()
 {
 	$access_token = Input::get('access_token');
 
-	// if laravel is running in debug mode you can always pass nonono as access token
-	if (Config::get('app.debug') && $access_token=="nonono") return;
-
 	$token = Token::where('key', $access_token)->firstOrFail();
-	if (!$token || $token->isExpired() || !$token->isActive()) return Redirect::to('500');
+	if (!$token || $token->isExpired() || !$token->isActive()) 
+		return Response::error('403');
 });
 
 Route::filter('auth', function()

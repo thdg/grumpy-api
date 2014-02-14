@@ -17,7 +17,7 @@ class CreateTableTokens extends Migration {
 			$table->increments('id');
 			$table->timestamps();
 
-			$table->integer('user')->unsigned()->foreign()->references('id')->on('users');
+			$table->integer('user_id')->unsigned()->foreign()->references('id')->on('users');
 
 			$table->string('key')->unique();
 			$table->boolean('active')->default(true);

@@ -79,33 +79,34 @@ Route::post('/user/', function()
 
 Route::get('/post/', function()
 {
-	return Post::all();
+	$posts = Post::all();
+	foreach ($posts as $post)
+	{
+		$post['user'] = $post->user;
+	}
+	return $posts;
 });
 
 Route::get('/post/{post_id}/', function($post_id)
 {
-	return Post::find($post_id);
+	$post = Post::find($post_id);
+	$post['user'] = $post->user;
+
+	return $post;
 });
 
 
 Route::post('/post/', array('before' => 'token', function()
 {
 	$access_token = Input::get('access_token');
-	$token = Token::where('key', $access_token)->firstOrFail();
-	$creator = $token->user;
 	$text = Input::get('text');
 
-	if (!$creator)
-	{
-		$response = array('message' => 'Currupted access token, no user found', 'status' => 'failed', 'token'=> $token->user, 'user'=> $creator);
-		return json_encode($response);
-	}
+	$token = Token::where('key', $access_token)->firstOrFail();
 
 	$post_data = array(
-		'creator' => $creator, 
+		'user_id' => $token->user->getKey(), 
 		'post' => $text
 	);
-
 	$post = Post::create($post_data);
 
 	$response = array('message' => 'New post created', 'status' => 'success');
@@ -129,8 +130,8 @@ Route::post('/login/', function()
 		{
 			$access_token = md5(rand());
 			$user = User::where('username', $username)->firstOrFail();
-			$token = Token::create(array('user' => $user, 'key' => $access_token, 'expire_date' => time() + (7*24*60*60)));
-		    $response = array('message' => 'User logged in', 'access_token' => $token->getKey(), 'status' => 'success');
+			$token = Token::create(array('user_id' => $user->getKey(), 'key' => $access_token, 'expire_date' => time() + (7*24*60*60)));
+		    $response = array('message' => 'User logged in', 'access_token' => $token->getToken(), 'status' => 'success');
 		} 
 		else 
 		{
