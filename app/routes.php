@@ -29,28 +29,35 @@ Route::get('/user/{user_id}/', function($user_id)
 
 Route::post('/user/', function()
 {
-	$username = Input::get('username');
-	$username_taken = User::where('username',$username)->count();
-	if ($username_taken>0) 
+	if (Input::has('username') && Input::has('password'))
 	{
-		$response = array('message' => 'Username already taken', 'status' => 'failed');
+		$username = Input::get('username');
+		$username_taken = User::where('username',$username)->count();
+		if ($username_taken>0) 
+		{
+			$response = array('message' => 'Username already taken', 'status' => 'failed');
+		}
+		else 
+		{
+			$password = Input::get('password');
+			$password = Hash::make($password);
+
+			$user_data = array(
+				'username' => $username, 
+				'password' => $password,
+			);
+
+			$user = User::create($user_data);
+
+			$response = array('message' => 'New user created', 'status' => 'success');
+		}
 	}
-	else 
+	else
 	{
-		$password = Input::get('password');
-		$password = Hash::make($password);
-
-		$user_data = array(
-			'username' => $username, 
-			'password' => $password,
-		);
-
-		$user = User::create($user_data);
-
-		$response = array('message' => 'New user created', 'status' => 'success');
+		$response = array('message' => 'Request must provide both username and password', 'status' => 'failed');
 	}
 
-	return json_encode($message);
+	return json_encode($response);
 });
 
 /*
@@ -59,20 +66,39 @@ Route::post('/user/', function()
 |--------------------------------------------------------------------------
 */
 
+Route::get('/post/', function()
+{
+	return Post::all();
+});
+
+Route::get('/post/{post_id}/', function($post_id)
+{
+	return Post::find($post_id);
+});
+
+
 Route::post('/post/', array('before' => 'token', function()
 {
-	$creator = Auth::user()->id;
+	$access_token = Input::get('access_token');
+	$token = Token::where('key', $access_token)->firstOrFail();
+	$creator = $token->user;
 	$text = Input::get('text');
+
+	if (!$creator)
+	{
+		$response = array('message' => 'Currupted access token, no user found', 'status' => 'failed', 'token'=> $token->user, 'user'=> $creator);
+		return json_encode($response);
+	}
 
 	$post_data = array(
 		'creator' => $creator, 
-		'text' => $text
+		'post' => $text
 	);
 
 	$post = Post::create($post_data);
 
 	$response = array('message' => 'New post created', 'status' => 'success');
-	return json_encode($message);
+	return json_encode($response);
 }));
 
 /*
@@ -83,17 +109,26 @@ Route::post('/post/', array('before' => 'token', function()
 
 Route::post('/login/', function()
 {
-	$username = Input::get('username');
-	$password = Input::get('password');
+	if (Input::has('username') && Input::has('password'))
+	{
+		$username = Input::get('username');
+		$password = Input::get('password');
 
-	if (Auth::attempt(array('username' => $username, 'password' => $password), true)) 
+		if (Auth::attempt(array('username' => $username, 'password' => $password), true)) 
+		{
+			$access_token = md5(rand());
+			$user = User::where('username', $username)->firstOrFail();
+			$token = Token::create(array('user' => $user, 'key' => $access_token, 'expire_date' => time() + (7*24*60*60)));
+		    $response = array('message' => 'User logged in', 'access_token' => $token->getKey(), 'status' => 'success');
+		} 
+		else 
+		{
+		    $response = array('message' => 'User not logged in', 'status' => 'failed');
+		}
+	}
+	else
 	{
-		$token = Token::create();
-	    $response = array('message' => 'User logged in', 'access_token' => $token->getKey(), 'status' => 'success');
-	} 
-	else 
-	{
-	    $response = array('message' => 'User not logged in', 'status' => 'failed');
+		$response = array('message' => 'Request must provide both username and password', 'status' => 'failed');
 	}
 
 	return json_encode($response);
@@ -102,7 +137,7 @@ Route::post('/login/', function()
 Route::post('/logout/', function()
 {
 	$access_token = Input::get('access_token');
-	$token = Token::where('key', $access_token)->get();
+	$token = Token::where('key', $access_token)->firstOrFail();
 	$token->deactivate();
 
 	$response = array('message' => 'User logged out', 'status' => 'success');

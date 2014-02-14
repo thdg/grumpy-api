@@ -33,7 +33,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	 */
 	public function getAuthIdentifier()
 	{
-		return $this->getKey();
+		return $this->username;
 	}
 
 	/**

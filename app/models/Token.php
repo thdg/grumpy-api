@@ -17,13 +17,19 @@ class Token extends Eloquent {
 	protected $fillable = array('user', 'expire_date', 'key', 'active');
 
 	/**
+	 * The attributes excluded from the model's JSON form.
+	 *
+	 * @var array
+	 */
+	protected $hidden = array('key');
+	/**
 	 * Get the access_token.
 	 *
 	 * @return string
 	 */
 	public function getKey()
 	{
-		return this->key;
+		return $this->key;
 	}
 
 	/**
@@ -34,7 +40,7 @@ class Token extends Eloquent {
 	public function isExpired()
 	{
 		$expired = $this->expire_date<time();
-		if ($expired && this->active) this->deactivate();
+		if ($expired && $this->active) $this->deactivate();
 		return $expired;
 	}
 
@@ -45,7 +51,7 @@ class Token extends Eloquent {
 	 */
 	public function isActive()
 	{
-		return this->active;
+		return $this->active;
 	}
 
 	/**
