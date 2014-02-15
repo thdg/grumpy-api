@@ -37,6 +37,11 @@ Route::get('/user/{user_id}/', function($user_id)
 	return Response::json(User::find($user_id));
 });
 
+Route::get('/user/search/{username}/', function($username)
+{
+	return Response::json(User::where('username', 'like', '%'.$username.'%')->get());
+});
+
 Route::get('/userexists/{username}/', function($username)
 {
 	$userCount = User::where('username', $username)->count();
