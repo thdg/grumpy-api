@@ -11,6 +11,12 @@
 |
 */
 
+function JsonError($message)
+{
+	return Response::json(array('message' => $message, 'status' => 'failed' ));
+};
+
+
 /*
 |--------------------------------------------------------------------------
 | User Routes
@@ -19,23 +25,18 @@
 
 Route::get('/user/', function()
 {
-	return User::all();
+	return Response::json(User::all());
 });
 
 Route::get('/user/{user_id}/', function($user_id)
 {
-	return User::find($user_id);
+	return Response::json(User::find($user_id));
 });
 
 Route::get('/userexists/{username}/', function($username)
 {
-	$userCount = User::where('username', '=' , $username)->count();
-
-	//TODO: Look into making this response more general
-	if ($userCount > 0)
-		return Response::json(array('user_available' => false));
-	else
-		return Response::json(array("user_available" => true));
+	$userCount = User::where('username', $username)->count();
+	return Response::json(array('user_available' => $userCount == 0));
 });
 
 Route::post('/user/', function()
@@ -46,7 +47,7 @@ Route::post('/user/', function()
 		$username_taken = User::where('username',$username)->count();
 		if ($username_taken>0) 
 		{
-			$response = array('message' => 'Username already taken', 'status' => 'failed');
+			return JsonError('Username already taken');
 		}
 		else 
 		{
@@ -60,15 +61,13 @@ Route::post('/user/', function()
 
 			$user = User::create($user_data);
 
-			$response = array('message' => 'New user created', 'status' => 'success');
+			return Response::json(array('message' => 'New user created', 'status' => 'success'));
 		}
 	}
 	else
 	{
-		$response = array('message' => 'Request must provide both username and password', 'status' => 'failed');
+		return JsonError('Request must provide both username and password');
 	}
-
-	return json_encode($response);
 });
 
 /*
@@ -84,7 +83,7 @@ Route::get('/post/', function()
 	{
 		$post['user'] = $post->user;
 	}
-	return $posts;
+	return Response::json($posts);
 });
 
 Route::get('/post/{post_id}/', function($post_id)
@@ -92,7 +91,7 @@ Route::get('/post/{post_id}/', function($post_id)
 	$post = Post::find($post_id);
 	$post['user'] = $post->user;
 
-	return $post;
+	return Response::json($post);
 });
 
 
@@ -109,8 +108,7 @@ Route::post('/post/', array('before' => 'token', function()
 	);
 	$post = Post::create($post_data);
 
-	$response = array('message' => 'New post created', 'status' => 'success');
-	return json_encode($response);
+	return Response::json(array('message' => 'New post created', 'status' => 'success'));
 }));
 
 /*
@@ -132,18 +130,17 @@ Route::post('/login/', function()
 			$user = User::where('username', $username)->firstOrFail();
 			$token = Token::create(array('user_id' => $user->getKey(), 'key' => $access_token, 'expire_date' => time() + (7*24*60*60)));
 		    $response = array('message' => 'User logged in', 'access_token' => $token->getToken(), 'status' => 'success');
+			return Response::json($response);
 		} 
 		else 
 		{
-		    $response = array('message' => 'User not logged in', 'status' => 'failed');
+		    return JsonError('Log in failed');
 		}
 	}
 	else
 	{
-		$response = array('message' => 'Request must provide both username and password', 'status' => 'failed');
+		return JsonError('Request must provide both username and password');
 	}
-
-	return json_encode($response);
 });
 
 Route::post('/logout/', function()
@@ -153,5 +150,5 @@ Route::post('/logout/', function()
 	$token->deactivate();
 
 	$response = array('message' => 'User logged out', 'status' => 'success');
-	return json_encode($response);
+	return Response::json($response);
 });

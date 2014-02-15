@@ -21,7 +21,7 @@ Notendur:
     POST /user/ -> búa til nýjan notanda
     PUT  /user/<user_id>/ -> uppfæra notanda 
     GET  /user/<user_id>/ -> Upplýsingar um notanda með auðkennið user_id
-    GET  /user/exists/?username=<name> -> True ef notandanafn er í tekið annars False
+    GET  /user/exists/<name>/ -> True ef notandanafn er í tekið annars False
     
 Tuð:
 
