@@ -16,6 +16,10 @@ function JsonError($message)
 	return Response::json(array('message' => $message, 'status' => 'failed' ));
 };
 
+function JsonSuccess($message)
+{
+	return Response::json(array('message' => $message, 'status' => 'success' ));
+};
 
 /*
 |--------------------------------------------------------------------------
@@ -41,32 +45,30 @@ Route::get('/userexists/{username}/', function($username)
 
 Route::post('/user/', function()
 {
-	if (Input::has('username') && Input::has('password'))
-	{
-		$username = Input::get('username');
-		$username_taken = User::where('username',$username)->count();
-		if ($username_taken>0) 
-		{
-			return JsonError('Username already taken');
-		}
-		else 
-		{
-			$password = Input::get('password');
-			$password = Hash::make($password);
-
-			$user_data = array(
-				'username' => $username, 
-				'password' => $password,
-			);
-
-			$user = User::create($user_data);
-
-			return Response::json(array('message' => 'New user created', 'status' => 'success'));
-		}
-	}
-	else
+	if ( !(Input::has('username') || Input::has('password')) )
 	{
 		return JsonError('Request must provide both username and password');
+	}
+	
+	$username = Input::get('username');
+	$username_taken = User::where('username',$username)->count();
+	if ($username_taken>0) 
+	{
+		return JsonError('Username already taken');
+	}
+	else 
+	{
+		$password = Input::get('password');
+		$password = Hash::make($password);
+
+		$user_data = array(
+			'username' => $username, 
+			'password' => $password,
+		);
+
+		$user = User::create($user_data);
+
+		return JsonSuccess('New user created');
 	}
 });
 
@@ -108,7 +110,7 @@ Route::post('/post/', array('before' => 'token', function()
 	);
 	$post = Post::create($post_data);
 
-	return Response::json(array('message' => 'New post created', 'status' => 'success'));
+	return JsonSuccess('New post created');
 }));
 
 /*
@@ -119,27 +121,25 @@ Route::post('/post/', array('before' => 'token', function()
 
 Route::post('/login/', function()
 {
-	if (Input::has('username') && Input::has('password'))
-	{
-		$username = Input::get('username');
-		$password = Input::get('password');
-
-		if (Auth::attempt(array('username' => $username, 'password' => $password), true)) 
-		{
-			$access_token = md5(rand());
-			$user = User::where('username', $username)->firstOrFail();
-			$token = Token::create(array('user_id' => $user->getKey(), 'key' => $access_token, 'expire_date' => time() + (7*24*60*60)));
-		    $response = array('message' => 'User logged in', 'access_token' => $token->getToken(), 'status' => 'success');
-			return Response::json($response);
-		} 
-		else 
-		{
-		    return JsonError('Log in failed');
-		}
-	}
-	else
+	if ( !(Input::has('username') || Input::has('password')) )
 	{
 		return JsonError('Request must provide both username and password');
+	}
+	
+	$username = Input::get('username');
+	$password = Input::get('password');
+
+	if (Auth::attempt(array('username' => $username, 'password' => $password))) 
+	{
+		$access_token = md5(rand());
+		$user = User::where('username', $username)->firstOrFail();
+		$token = Token::create(array('user_id' => $user->getKey(), 'key' => $access_token, 'expire_date' => time() + (7*24*60*60)));
+	    $response = array('message' => 'User logged in', 'access_token' => $token->getToken());
+		return Response::json($response);
+	} 
+	else 
+	{
+	    return JsonError('Log in failed');
 	}
 });
 
@@ -149,6 +149,6 @@ Route::post('/logout/', function()
 	$token = Token::where('key', $access_token)->firstOrFail();
 	$token->deactivate();
 
-	$response = array('message' => 'User logged out', 'status' => 'success');
+	JsonSuccess('User logged out');
 	return Response::json($response);
 });
