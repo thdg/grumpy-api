@@ -13,12 +13,12 @@
 
 function JsonError($message)
 {
-	return Response::json(array('message' => $message, 'status' => 'failed' ));
+	return Response::json(array('message' => $message, 'status_message' => 'failed', 'status' => false ));
 };
 
 function JsonSuccess($message)
 {
-	return Response::json(array('message' => $message, 'status' => 'success' ));
+	return Response::json(array('message' => $message, 'status_message' => 'success', 'status' => true ));
 };
 
 /*
