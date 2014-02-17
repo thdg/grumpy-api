@@ -106,6 +106,8 @@ Route::put('/user/', function()
 		$user->avatar = Input::get("avatar");
 
 	$user->update();
+
+	return JsonSuccess("Updated user successfully");
 });
 
 /*
