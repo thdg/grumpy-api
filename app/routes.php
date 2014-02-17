@@ -77,6 +77,37 @@ Route::post('/user/', function()
 	}
 });
 
+Route::put('/user/', function()
+{
+	$access_token = Input::get('access_token');
+
+	$token = Token::where('key', $access_token)->firstOrFail();
+
+	$userid = $token->user->getKey();
+
+	$user = User::find($userid);
+
+	if (Input::has("first_name"))
+		$user->first_name = Input::get("first_name");
+
+	if (Input::has("last_name"))
+		$user->last_name = Input::get("last_name");
+
+	if (Input::has("email"))
+		$user->email = Input::get("email");
+
+	if (Input::has("birthday"))
+		$user->birthday = Input::get("birthday");
+
+	if (Input::has("about"))
+		$user->about = Input::get("about");
+
+	if (Input::has("avatar"))
+		$user->avatar = Input::get("avatar");
+
+	$user->update();
+});
+
 /*
 |--------------------------------------------------------------------------
 | Post Routes
