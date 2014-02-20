@@ -37,12 +37,12 @@ Route::get('/user/{user_id}/', function($user_id)
 	return Response::json(User::find($user_id));
 });
 
-Route::get('/user/search/{username}/', function($username)
+Route::get('/user/{username}/search', function($username)
 {
 	return Response::json(User::where('username', 'like', '%'.$username.'%')->get());
 });
 
-Route::get('/userexists/{username}/', function($username)
+Route::get('/user/{username}/exists', function($username)
 {
 	$userCount = User::where('username', $username)->count();
 	return Response::json(array('user_available' => $userCount == 0));
@@ -166,8 +166,6 @@ Route::post('/login/', function()
 		$token = Token::create(array('user_id' => $user->getKey(), 'key' => $access_token, 'expire_date' => time() + (7*24*60*60)));
 	    $response = array('message' => 'User logged in', 'access_token' => $token->getToken(), 'user' => $user->toArray());
 		return Response::json($response);
-
-		//return Response::json($user);
 	} 
 	else 
 	{
