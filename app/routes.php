@@ -66,9 +66,18 @@ Route::post('/user/', function()
 		$password = Input::get('password');
 		$password = Hash::make($password);
 
+		$first_name = Input::get('first_name');
+		$last_name = Input::get('last_name');
+		$about = Input::get('about');
+		$avatar = Input::get('avatar');
+
 		$user_data = array(
 			'username' => $username, 
 			'password' => $password,
+			'first_name' => $first_name,
+			'last_name' => $last_name,
+			'about' => $about,
+			'avatar' => $avatar
 		);
 
 		$user = User::create($user_data);
@@ -164,7 +173,13 @@ Route::post('/login/', function()
 		$access_token = md5(rand());
 		$user = User::where('username', $username)->firstOrFail();
 		$token = Token::create(array('user_id' => $user->getKey(), 'key' => $access_token, 'expire_date' => time() + (7*24*60*60)));
-	    $response = array('message' => 'User logged in', 'access_token' => $token->getToken(), 'user' => $user->toArray());
+	   
+	    $response = array(
+	    	'message' => 'User logged in', 
+	    	'access_token' => $token->getToken(), 
+	    	'user' => $user->toArray(),
+	    	'status' => TRUE);
+
 		return Response::json($response);
 	} 
 	else 
