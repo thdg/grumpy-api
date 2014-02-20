@@ -164,8 +164,10 @@ Route::post('/login/', function()
 		$access_token = md5(rand());
 		$user = User::where('username', $username)->firstOrFail();
 		$token = Token::create(array('user_id' => $user->getKey(), 'key' => $access_token, 'expire_date' => time() + (7*24*60*60)));
-	    $response = array('message' => 'User logged in', 'access_token' => $token->getToken(), 'fuckingshitter' => $user->toJson());
+	    $response = array('message' => 'User logged in', 'access_token' => $token->getToken(), 'user' => $user->toArray());
 		return Response::json($response);
+
+		//return Response::json($user);
 	} 
 	else 
 	{
