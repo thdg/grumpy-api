@@ -118,20 +118,12 @@ Route::put('/user/', function()
 
 Route::get('/post/', function()
 {
-	$posts = Post::all();
-	foreach ($posts as $post)
-	{
-		$post['user'] = $post->user;
-	}
-	return Response::json($posts);
+	return Post::with('user')->get();
 });
 
 Route::get('/post/{post_id}/', function($post_id)
 {
-	$post = Post::find($post_id);
-	$post['user'] = $post->user;
-
-	return Response::json($post);
+	return Post::with('user')->find($post_id);
 });
 
 
@@ -172,7 +164,7 @@ Route::post('/login/', function()
 		$access_token = md5(rand());
 		$user = User::where('username', $username)->firstOrFail();
 		$token = Token::create(array('user_id' => $user->getKey(), 'key' => $access_token, 'expire_date' => time() + (7*24*60*60)));
-	    $response = array('message' => 'User logged in', 'access_token' => $token->getToken());
+	    $response = array('message' => 'User logged in', 'access_token' => $token->getToken(), 'fuckingshitter' => $user->toJson());
 		return Response::json($response);
 	} 
 	else 
