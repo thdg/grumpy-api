@@ -127,7 +127,7 @@ Route::put('/user/', function()
 
 Route::get('/post/', function()
 {
-	return Post::with('user')->get();
+	return Post::with('user')->orderBy('created_at', 'desc')->get();
 });
 
 Route::get('/post/{post_id}/', function($post_id)
@@ -139,7 +139,7 @@ Route::get('/post/{post_id}/', function($post_id)
 Route::post('/post/', array('before' => 'token', function()
 {
 	$access_token = Input::get('access_token');
-	$text = Input::get('text');
+	$text = Input::get('post');
 
 	$token = Token::where('key', $access_token)->firstOrFail();
 
