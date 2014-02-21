@@ -135,6 +135,14 @@ Route::get('/post/{post_id}/', function($post_id)
 	return Post::with('user')->find($post_id);
 });
 
+Route::delete('/post/{post_id}/', function($post_id)
+{
+	//We'll need to add some authentication here, retrofit does not allow to set body
+	//on delete method
+	Post::destroy($post_id);
+
+	return JsonSuccess("Deleted post with id=".$post_id);
+});
 
 Route::post('/post/', array('before' => 'token', function()
 {
@@ -194,6 +202,5 @@ Route::post('/logout/', function()
 	$token = Token::where('key', $access_token)->firstOrFail();
 	$token->deactivate();
 
-	JsonSuccess('User logged out');
-	return Response::json($response);
+	return JsonSuccess('User logged out');
 });
