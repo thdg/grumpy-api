@@ -135,13 +135,24 @@ Route::get('/post/{post_id}/', function($post_id)
 	return Post::with('user')->find($post_id);
 });
 
-Route::delete('/post/{post_id}/', function($post_id)
+Route::delete('/post/{post_id}/{access_token}', function($post_id, $access_token)
 {
-	//We'll need to add some authentication here, retrofit does not allow to set body
-	//on delete method
-	Post::destroy($post_id);
+	//TODO: Added authentication through url, not the best way or the restful way
+	//Look into this, works though
 
-	return JsonSuccess("Deleted post with id=".$post_id);
+	$token = Token::where('key', $access_token)->firstOrFail();
+
+	$post = Post::find($post_id);
+
+	$postCreator = $post->user->id;
+
+	if($postCreator == $token->user->getKey())
+	{
+		$post->delete();
+		return JsonSuccess("Deleted post with id=".$post_id);
+	}
+	else
+		return JsonError("Couldn't delete post with id=".$post_id);
 });
 
 Route::post('/post/', array('before' => 'token', function()
