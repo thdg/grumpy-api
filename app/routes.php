@@ -48,6 +48,21 @@ Route::get('/user/{username}/exists', function($username)
 	return Response::json(array('user_available' => $userCount == 0));
 });
 
+Route::get('/user/{user_id}/info', function($user_id)
+{
+	$user = User::find($user_id);
+
+	$posts = Post::with('user')
+				   ->where('user_id', $user_id)
+				   ->orderBy('created_at', 'desc')
+				   ->get();
+
+	$response = array('user' => $user->toArray(), 
+					  'posts' => $posts->toArray());
+
+	return Response::json($response);
+});
+
 Route::post('/user/', function()
 {
 	if ( !(Input::has('username') || Input::has('password')) )
