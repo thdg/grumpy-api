@@ -32,4 +32,9 @@ class Post extends Eloquent {
 	{
 		return $this->hasMany('PostLikes');
 	}
+
+	public function comments()
+	{
+		return $this->hasMany('PostComments');
+	}
 }

@@ -3,8 +3,8 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTablePostlikes extends Migration 
-{
+class CreateTablePostcomments extends Migration {
+
 	/**
 	 * Run the migrations.
 	 *
@@ -12,15 +12,14 @@ class CreateTablePostlikes extends Migration
 	 */
 	public function up()
 	{
-		Schema::create('postlikes', function(Blueprint $table)
+		Schema::create('postcomments', function(Blueprint $table)
 		{
 			$table->increments('id');
 			$table->timestamps();
 
 			$table->integer('user_id')->unsigned()->foreign()->references('id')->on('users');
 			$table->integer('post_id')->unsigned()->foreign()->references('id')->on('posts');
-
-			$table->unique(array('user_id', 'post_id'));
+			$table->string('comment');
 		});
 	}
 
@@ -31,6 +30,7 @@ class CreateTablePostlikes extends Migration
 	 */
 	public function down()
 	{
-		Schema::drop('postlikes');
+		Schema::drop('postcomments');
 	}
+
 }

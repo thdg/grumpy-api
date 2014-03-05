@@ -84,7 +84,7 @@ Route::get('/user/{username}/exists', function($username)
 */	
 Route::get('/user/{user_id}/info', function($user_id)
 {
-	$user = User::find($user_id);
+	$user = User::findOrFail($user_id);
 
 	$posts = Post::with('user')
 				   ->where('user_id', $user_id)
@@ -185,7 +185,7 @@ Route::put('/user/', function()
 
 Route::get('/post/', function()
 {
-	return Post::with('user', 'likes.user')
+	return Post::with('user', 'likes.user', 'comments.user')
 				 ->orderBy('created_at', 'desc')
 				 ->get();
 });
@@ -237,7 +237,15 @@ Route::post('/post/', array('before' => 'token', function()
 |--------------------------------------------------------------------------
 */
 
-Route::post('/likepost/{post_id}', function($post_id)
+
+/**
+ * Like Post with id $post_id
+ * Json request  is on the form {"access_token":"input_access_token"}
+ * 
+ * @var $post_id
+ * @return Json response
+*/	
+Route::post('/post/like/{post_id}', function($post_id)
 {
 	$access_token = Input::get('access_token');
 
@@ -251,6 +259,39 @@ Route::post('/likepost/{post_id}', function($post_id)
 
 	return JsonSuccess('Liked post with id='.$post_id);
 });
+
+/*
+|--------------------------------------------------------------------------
+| Comment Post Routes
+|--------------------------------------------------------------------------
+*/
+
+
+/**
+ * Comment on Post with id $post_id
+ * Json request is on the form {"access_token":"input_access_token", "comment":"input_comment"}
+ * 
+ * @var $post_id
+ * @return Json response
+*/	
+Route::post('/post/comment/{post_id}', function($post_id)
+{
+	$access_token = Input::get('access_token');
+	$comment = Input::get("comment");
+
+	$token = Token::where('key', $access_token)->firstOrFail();
+
+	$post_data = array(
+		'user_id' => $token->user->getKey(),
+		'post_id' => $post_id,
+		'comment' => $comment
+	);
+
+	$comment = PostComments::create($post_data);
+
+	return JsonSuccess('Comment on post with id='.$post_id);
+});
+
 
 /*
 |--------------------------------------------------------------------------
