@@ -125,10 +125,10 @@ Route::post('/user/', function()
 		$user_data = array(
 			'username' => $username, 
 			'password' => $password,
-			'first_name' => Input::get('first_name');,
-			'last_name' => Input::get('last_name');,
-			'about' => Input::get('about');,
-			'avatar' => Input::get('avatar');
+			'first_name' => Input::get('first_name'),
+			'last_name' => Input::get('last_name'),
+			'about' => Input::get('about'),
+			'avatar' => Input::get('avatar')
 		);
 
 		$user = User::create($user_data);
