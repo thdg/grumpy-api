@@ -142,7 +142,9 @@ Route::put('/user/', function()
 
 Route::get('/post/', function()
 {
-	return Post::with('user')->orderBy('created_at', 'desc')->get();
+	return Post::with('user', 'likes.user')
+				 ->orderBy('created_at', 'desc')
+				 ->get();
 });
 
 Route::get('/post/{post_id}/', function($post_id)
@@ -185,6 +187,27 @@ Route::post('/post/', array('before' => 'token', function()
 
 	return JsonSuccess('New post created');
 }));
+
+/*
+|--------------------------------------------------------------------------
+| Like Post Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::post('/likepost/{post_id}', function($post_id)
+{
+	$access_token = Input::get('access_token');
+
+	$token = Token::where('key', $access_token)->firstOrFail();
+	
+	$post_data = array(
+				 'user_id' => $token->user->getKey(),
+				 'post_id' => $post_id);
+
+	$post = PostLikes::create($post_data);
+
+	return JsonSuccess('Liked post with id='.$post_id);
+});
 
 /*
 |--------------------------------------------------------------------------

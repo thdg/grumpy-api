@@ -1,13 +1,13 @@
 <?php
 
-class Post extends Eloquent {
+class PostLikes extends Eloquent {
 
 	/**
 	 * The database table used by the model.
 	 *
 	 * @var string
 	 */
-	protected $table = 'posts';
+	protected $table = 'postlikes';
 
 	/**
 	 * The attributes excluded from the model's JSON form.
@@ -21,15 +21,15 @@ class Post extends Eloquent {
 	 *
 	 * @var string
 	 */
-	protected $fillable = array('user_id', 'post');
+	protected $fillable = array('user_id', 'post_id');
+
+	public function post()
+	{
+		return $this->belongsTo('Post');
+	}
 
 	public function user()
 	{
 		return $this->belongsTo('User');
-	}
-
-	public function likes()
-	{
-		return $this->hasMany('PostLikes');
 	}
 }
