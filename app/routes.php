@@ -27,27 +27,61 @@ function JsonSuccess($message)
 |--------------------------------------------------------------------------
 */
 
+
+/**
+ * All users in the database
+ *
+ * @return Json representation of users
+*/	
 Route::get('/user/', function()
 {
 	return Response::json(User::all());
 });
 
+
+/**
+ * Gets specific user by id
+ *
+ * @var user_id 
+ * @return Json representation of user
+*/	
 Route::get('/user/{user_id}/', function($user_id)
 {
 	return Response::json(User::find($user_id));
 });
 
+
+/**
+ * Searches database by the query string username for users
+ *
+ * @var username 
+ * @return Json representation of a list of users
+*/	
 Route::get('/user/{username}/search', function($username)
 {
 	return Response::json(User::where('username', 'like', '%'.$username.'%')->get());
 });
 
+
+/**
+ * Checks if username exists in database
+ *
+ * @var username 
+ * @return Json representation if user exists
+*/	
 Route::get('/user/{username}/exists', function($username)
 {
 	$userCount = User::where('username', $username)->count();
 	return Response::json(array('user_available' => $userCount == 0));
 });
 
+
+/**
+ * Gets basic user information and all his posts
+ *
+ * @var user_id 
+ * @return Json representation of user info and posts
+*/	
 Route::get('/user/{user_id}/info', function($user_id)
 {
 	$user = User::find($user_id);
@@ -63,6 +97,13 @@ Route::get('/user/{user_id}/info', function($user_id)
 	return Response::json($response);
 });
 
+
+/**
+ * Inserts a new user into the database if requirements are fulfilled
+ * Post data is on the form {"username":"input_username", "password":"input_password"}
+ * 
+ * @return Json representation if user exists
+*/	
 Route::post('/user/', function()
 {
 	if ( !(Input::has('username') || Input::has('password')) )
@@ -81,18 +122,13 @@ Route::post('/user/', function()
 		$password = Input::get('password');
 		$password = Hash::make($password);
 
-		$first_name = Input::get('first_name');
-		$last_name = Input::get('last_name');
-		$about = Input::get('about');
-		$avatar = Input::get('avatar');
-
 		$user_data = array(
 			'username' => $username, 
 			'password' => $password,
-			'first_name' => $first_name,
-			'last_name' => $last_name,
-			'about' => $about,
-			'avatar' => $avatar
+			'first_name' => Input::get('first_name');,
+			'last_name' => Input::get('last_name');,
+			'about' => Input::get('about');,
+			'avatar' => Input::get('avatar');
 		);
 
 		$user = User::create($user_data);
@@ -101,6 +137,13 @@ Route::post('/user/', function()
 	}
 });
 
+
+/**
+ * Update user data in database, access_token needs to be sent with request
+ * Post data is on the form {"first_name":"input_firstname", ...etc}
+ * 
+ * @return Json representation if user exists
+*/	
 Route::put('/user/', function()
 {
 	$access_token = Input::get('access_token');
