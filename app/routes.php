@@ -86,7 +86,7 @@ Route::get('/user/{user_id}/info', function($user_id)
 {
 	$user = User::findOrFail($user_id);
 
-	$posts = Post::with('user')
+	$posts = Post::with('user', 'likes.user', 'comments.user')
 				   ->where('user_id', $user_id)
 				   ->orderBy('created_at', 'desc')
 				   ->get();
@@ -192,7 +192,7 @@ Route::get('/post/', function()
 
 Route::get('/post/{post_id}/', function($post_id)
 {
-	return Post::with('user')->find($post_id);
+	return Post::with('user', 'likes.user', 'comments.user')->find($post_id);
 });
 
 Route::delete('/post/{post_id}/{access_token}', function($post_id, $access_token)
