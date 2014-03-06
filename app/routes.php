@@ -289,7 +289,9 @@ Route::post('/post/comment/{post_id}', function($post_id)
 
 	$comment = PostComments::create($post_data);
 
-	return JsonSuccess('Comment on post with id='.$post_id);
+	return Response::json($comment->with('user')
+				   ->where('id', $comment->id)
+				   ->first());
 });
 
 
