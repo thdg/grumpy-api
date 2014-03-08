@@ -255,9 +255,11 @@ Route::post('/post/like/{post_id}', function($post_id)
 				 'user_id' => $token->user->getKey(),
 				 'post_id' => $post_id);
 
-	$post = PostLikes::create($post_data);
+	$like = PostLikes::create($post_data);
 
-	return JsonSuccess('Liked post with id='.$post_id);
+	return Response::json($like->with('user')
+							   ->where('id', $like->id)
+							   ->first());
 });
 
 /*
