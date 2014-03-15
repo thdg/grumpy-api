@@ -17,6 +17,8 @@ class CreateTableFollow extends Migration {
 			$table->increments('id');
 			$table->integer('follower')->unsigned()->foreign()->references('id')->on('users');
 			$table->integer('following')->unsigned()->foreign()->references('id')->on('users');
+
+			$table->unique(array('follower', 'following'));
 		});
 	}
 

@@ -299,6 +299,52 @@ Route::post('/post/comment/{post_id}', function($post_id)
 
 /*
 |--------------------------------------------------------------------------
+| Follow User Routes
+|--------------------------------------------------------------------------
+*/
+
+
+/**
+ * Follow user with id $user_id
+ * Json request is on the form {"access_token":"input_access_token"}
+ * 
+ * @var $user_id
+ * @return Json response
+*/	
+Route::post('/follow/{user_id}', function($user_id)
+{
+	$access_token = Input::get('access_token');
+
+	$token = Token::where('key', $access_token)->firstOrFail();
+
+	$follow_data = array(
+		'follower' => $token->user->getKey(),
+		'following' => $user_id
+	);
+
+	$following = Follow::create($follow_data);
+
+	return JsonSuccess('Followed user with id='.$user_id);
+});
+
+
+/**
+ * Get Followers for user with id = $user_id
+ * 
+ * @return Json response
+*/	
+Route::get('/follow/{user_id}/', function($user_id)
+{
+	$following = Follow::with('userFollowing')
+						->where('follower', $user_id)
+						->get();
+	
+	return Response::json($following);
+});
+
+
+/*
+|--------------------------------------------------------------------------
 | Authentication Routes
 |--------------------------------------------------------------------------
 */
