@@ -231,6 +231,21 @@ Route::post('/post/', array('before' => 'token', function()
 	return JsonSuccess('New post created');
 }));
 
+
+Route::get('/post/following/{user_id}', function($user_id)
+{
+	$following = DB::table('followers')
+			   		->where('follower', 1)
+			   		->select('following')
+			   		->lists('following');
+
+	return Post::with('user', 'likes.user', 'comments.user')
+				 ->whereIn('user_id', $following)
+				 ->orderBy('created_at', 'desc')
+				 ->get();
+});
+
+
 /*
 |--------------------------------------------------------------------------
 | Like Post Routes
