@@ -44,7 +44,7 @@ App::after(function($request, $response)
 
 Route::filter('token', function()
 {
-	$access_token = Input::get('access_token');
+	$access_token = Request::header('Authorization');
 
 	$token = Token::where('key', $access_token)->firstOrFail();
 	if (!$token || $token->isExpired() || !$token->isActive()) 

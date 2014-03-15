@@ -58,7 +58,7 @@ Route::get('/user/{user_id}/', function($user_id)
  * @return Json representation of a list of users
 */	
 Route::get('/user/{username}/search', function($username)
-{
+{			   		
 	return Response::json(User::where('username', 'like', '%'.$username.'%')->get());
 });
 
@@ -144,9 +144,9 @@ Route::post('/user/', function()
  * 
  * @return Json representation if user exists
 */	
-Route::put('/user/', function()
+Route::put('/user/', array('before' => 'token', function()
 {
-	$access_token = Input::get('access_token');
+	$access_token = Request::header('Authorization');
 
 	$token = Token::where('key', $access_token)->firstOrFail();
 
@@ -175,7 +175,7 @@ Route::put('/user/', function()
 	$user->update();
 
 	return JsonSuccess("Updated user successfully");
-});
+}));
 
 /*
 |--------------------------------------------------------------------------
@@ -195,10 +195,9 @@ Route::get('/post/{post_id}/', function($post_id)
 	return Post::with('user', 'likes.user', 'comments.user')->find($post_id);
 });
 
-Route::delete('/post/{post_id}/{access_token}', function($post_id, $access_token)
+Route::delete('/post/{post_id}', array('before' => 'token', function($post_id)
 {
-	//TODO: Added authentication through url, not the best way or the restful way
-	//Look into this, works though
+	$access_token = Request::header('Authorization');
 
 	$token = Token::where('key', $access_token)->firstOrFail();
 
@@ -213,11 +212,12 @@ Route::delete('/post/{post_id}/{access_token}', function($post_id, $access_token
 	}
 	else
 		return JsonError("Couldn't delete post with id=".$post_id);
-});
+}));
+
 
 Route::post('/post/', array('before' => 'token', function()
 {
-	$access_token = Input::get('access_token');
+	$access_token = Request::header('Authorization');
 	$text = Input::get('post');
 
 	$token = Token::where('key', $access_token)->firstOrFail();
@@ -235,7 +235,7 @@ Route::post('/post/', array('before' => 'token', function()
 Route::get('/post/following/{user_id}', function($user_id)
 {
 	$following = DB::table('followers')
-			   		->where('follower', 1)
+			   		->where('follower', $user_id)
 			   		->select('following')
 			   		->lists('following');
 
@@ -260,9 +260,9 @@ Route::get('/post/following/{user_id}', function($user_id)
  * @var $post_id
  * @return Json response
 */	
-Route::post('/post/like/{post_id}', function($post_id)
+Route::post('/post/like/{post_id}', array('before' => 'token', function($post_id)
 {
-	$access_token = Input::get('access_token');
+	$access_token = Request::header('Authorization');
 
 	$token = Token::where('key', $access_token)->firstOrFail();
 	
@@ -275,7 +275,7 @@ Route::post('/post/like/{post_id}', function($post_id)
 	return Response::json($like->with('user')
 							   ->where('id', $like->id)
 							   ->first());
-});
+}));
 
 /*
 |--------------------------------------------------------------------------
@@ -291,9 +291,9 @@ Route::post('/post/like/{post_id}', function($post_id)
  * @var $post_id
  * @return Json response
 */	
-Route::post('/post/comment/{post_id}', function($post_id)
+Route::post('/post/comment/{post_id}', array('before' => 'token', function($post_id)
 {
-	$access_token = Input::get('access_token');
+	$access_token = Request::header('Authorization');
 	$comment = Input::get("comment");
 
 	$token = Token::where('key', $access_token)->firstOrFail();
@@ -309,7 +309,7 @@ Route::post('/post/comment/{post_id}', function($post_id)
 	return Response::json($comment->with('user')
 				   ->where('id', $comment->id)
 				   ->first());
-});
+}));
 
 
 /*
@@ -326,9 +326,9 @@ Route::post('/post/comment/{post_id}', function($post_id)
  * @var $user_id
  * @return Json response
 */	
-Route::post('/follow/{user_id}', function($user_id)
+Route::post('/follow/{user_id}', array('before' => 'token', function($user_id)
 {
-	$access_token = Input::get('access_token');
+	$access_token = Request::header('Authorization');
 
 	$token = Token::where('key', $access_token)->firstOrFail();
 
@@ -340,7 +340,7 @@ Route::post('/follow/{user_id}', function($user_id)
 	$following = Follow::create($follow_data);
 
 	return JsonSuccess('Followed user with id='.$user_id);
-});
+}));
 
 
 /**
@@ -396,7 +396,7 @@ Route::post('/login/', function()
 
 Route::post('/logout/', function()
 {
-	$access_token = Input::get('access_token');
+	$access_token = Request::header('Authorization');
 	$token = Token::where('key', $access_token)->firstOrFail();
 	$token->deactivate();
 

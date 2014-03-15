@@ -14,7 +14,7 @@ class PostLikes extends Eloquent {
 	 *
 	 * @var array
 	 */
-	protected $hidden = array('user_id');
+	protected $hidden = array();
 
 	/**
 	 * The attributes that can be mass assigned.
