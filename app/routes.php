@@ -21,6 +21,7 @@ function JsonSuccess($message)
 	return Response::json(array('message' => $message, 'status_message' => 'success', 'status' => true ));
 };
 
+
 /*
 |--------------------------------------------------------------------------
 | User Routes
@@ -119,6 +120,13 @@ Route::post('/user/', function()
 	}
 	else 
 	{
+		$base64_image = Input::get('base64image');
+	
+		$image = public_path().'/img/user'.$username.'.jpg';
+		file_put_contents($image, base64_decode($base64_image));
+
+		$avatarLocation = 'http://arnarh.com/grumpy/public/img/user'.$username.'.jpg';
+
 		$password = Input::get('password');
 		$password = Hash::make($password);
 
@@ -128,7 +136,7 @@ Route::post('/user/', function()
 			'first_name' => Input::get('first_name'),
 			'last_name' => Input::get('last_name'),
 			'about' => Input::get('about'),
-			'avatar' => Input::get('avatar')
+			'avatar' => $avatarLocation
 		);
 
 		$user = User::create($user_data);
