@@ -11,14 +11,12 @@
 |
 */
 
-function JsonError($message)
+function CustomJsonResponse($message, $status)
 {
-	return Response::json(array('message' => $message, 'status_message' => 'failed', 'status' => false ));
-};
-
-function JsonSuccess($message)
-{
-	return Response::json(array('message' => $message, 'status_message' => 'success', 'status' => true ));
+	$reponse = array('message' => $message, 
+			         'status' => $status );
+	
+	return Response::json($response);
 };
 
 
@@ -109,14 +107,14 @@ Route::post('/user/', function()
 {
 	if ( !(Input::has('username') || Input::has('password')) )
 	{
-		return JsonError('Request must provide both username and password');
+		return CustomJsonResponse('Request must provide both username and password', false);
 	}
 	
 	$username = Input::get('username');
 	$username_taken = User::where('username',$username)->count();
 	if ($username_taken>0) 
 	{
-		return JsonError('Username already taken');
+		return CustomJsonResponse('Username already taken', false);
 	}
 	else 
 	{
@@ -141,7 +139,7 @@ Route::post('/user/', function()
 
 		$user = User::create($user_data);
 
-		return JsonSuccess('New user created');
+		return CustomJsonResponse('New user created', true);	
 	}
 });
 
@@ -182,7 +180,7 @@ Route::put('/user/', array('before' => 'token', function()
 
 	$user->update();
 
-	return JsonSuccess("Updated user successfully");
+	return CustomJsonResponse('Updated user successfully', true);
 }));
 
 /*
@@ -216,10 +214,10 @@ Route::delete('/post/{post_id}', array('before' => 'token', function($post_id)
 	if($postCreator == $token->user->getKey())
 	{
 		$post->delete();
-		return JsonSuccess("Deleted post with id=".$post_id);
+		return CustomJsonResponse("Deleted post with id=".$post_id, true);
 	}
 	else
-		return JsonError("Couldn't delete post with id=".$post_id);
+		return CustomJsonResponse("Couldn't delete post with id=".$post_id, false);
 }));
 
 
@@ -234,9 +232,10 @@ Route::post('/post/', array('before' => 'token', function()
 		'user_id' => $token->user->getKey(), 
 		'post' => $text
 	);
+	
 	$post = Post::create($post_data);
 
-	return JsonSuccess('New post created');
+	return CustomJsonResponse('New post created', true);
 }));
 
 
@@ -347,7 +346,7 @@ Route::post('/follow/{user_id}', array('before' => 'token', function($user_id)
 
 	$following = Follow::create($follow_data);
 
-	return JsonSuccess('Followed user with id='.$user_id);
+	return CustomJsonResponse('Followed user with id='.$user_id, true);
 }));
 
 
@@ -397,9 +396,7 @@ Route::post('/login/', function()
 		return Response::json($response);
 	} 
 	else 
-	{
-	    return JsonError('Log in failed');
-	}
+		return CustomJsonResponse('Log in failed', false);
 });
 
 Route::post('/logout/', function()
@@ -408,5 +405,5 @@ Route::post('/logout/', function()
 	$token = Token::where('key', $access_token)->firstOrFail();
 	$token->deactivate();
 
-	return JsonSuccess('User logged out');
+	return CustomJsonResponse('User logged out', true);
 });

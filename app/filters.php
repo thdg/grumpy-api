@@ -99,6 +99,5 @@ Route::filter('csrf', function()
 
 App::error(function(ModelNotFoundException $e)
 {
-	//TODO: Return json here
     return Response::make('Not Found', 404);
 });
