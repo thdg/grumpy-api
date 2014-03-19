@@ -375,7 +375,7 @@ Route::post('/login/', function()
 {
 	if ( !(Input::has('username') || Input::has('password')) )
 	{
-		return JsonError('Request must provide both username and password');
+		return CustomJsonResponse('Request must provide both username and password', false);
 	}
 	
 	$username = Input::get('username');
