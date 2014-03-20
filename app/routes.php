@@ -47,7 +47,8 @@ Route::get('/user/', function()
 Route::get('/user/{user_id}/', function($user_id)
 {
 	return Response::json(User::find($user_id));
-});
+}
+)->where('user_id', '[0-9]+');
 
 
 /**
@@ -94,7 +95,8 @@ Route::get('/user/{user_id}/info', function($user_id)
 					  'posts' => $posts->toArray());
 
 	return Response::json($response);
-});
+}
+)->where('user_id', '[0-9]+');
 
 
 /**
@@ -199,7 +201,8 @@ Route::get('/post/', function()
 Route::get('/post/{post_id}/', function($post_id)
 {
 	return Post::with('user', 'likes.user', 'comments.user')->find($post_id);
-});
+}
+)->where('post_id', '[0-9]+');
 
 Route::delete('/post/{post_id}', array('before' => 'token', function($post_id)
 {
@@ -218,7 +221,8 @@ Route::delete('/post/{post_id}', array('before' => 'token', function($post_id)
 	}
 	else
 		return CustomJsonResponse("Couldn't delete post with id=".$post_id, false);
-}));
+})
+)->where('post_id', '[0-9]+');;
 
 
 Route::post('/post/', array('before' => 'token', function()
@@ -250,7 +254,8 @@ Route::get('/post/following/{user_id}', function($user_id)
 				 ->whereIn('user_id', $following)
 				 ->orderBy('created_at', 'desc')
 				 ->get();
-});
+}
+)->where('user_id', '[0-9]+');
 
 
 /*
@@ -282,7 +287,8 @@ Route::post('/post/like/{post_id}', array('before' => 'token', function($post_id
 	return Response::json($like->with('user')
 							   ->where('id', $like->id)
 							   ->first());
-}));
+})
+)->where('post_id', '[0-9]+');
 
 /*
 |--------------------------------------------------------------------------
@@ -316,7 +322,8 @@ Route::post('/post/comment/{post_id}', array('before' => 'token', function($post
 	return Response::json($comment->with('user')
 				   ->where('id', $comment->id)
 				   ->first());
-}));
+})
+)->where('post_id', '[0-9]+');
 
 
 /*
@@ -347,7 +354,8 @@ Route::post('/follow/{user_id}', array('before' => 'token', function($user_id)
 	$following = Follow::create($follow_data);
 
 	return CustomJsonResponse('Followed user with id='.$user_id, true);
-}));
+})
+)->where('user_id', '[0-9]+');;
 
 
 /**
@@ -362,7 +370,8 @@ Route::get('/follow/{user_id}/', function($user_id)
 						->get();
 	
 	return Response::json($following);
-});
+}
+)->where('user_id', '[0-9]+');;
 
 
 /*
