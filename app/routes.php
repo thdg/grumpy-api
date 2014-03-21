@@ -290,6 +290,40 @@ Route::post('/post/like/{post_id}', array('before' => 'token', function($post_id
 })
 )->where('post_id', '[0-9]+');
 
+
+/*
+|--------------------------------------------------------------------------
+| Unlike Post Routes
+|--------------------------------------------------------------------------
+*/
+
+
+/**
+ * Unlike Post with id $like_id
+ * Json request  is on the form {"access_token":"input_access_token"}
+ * 
+ * @var $like_id
+ * @return Json response
+*/	
+Route::delete('/post/like/{like_id}', array('before' => 'token', function($like_id)
+{
+	$access_token = Request::header('Authorization');
+	$token = Token::where('key', $access_token)->firstOrFail();
+
+	$like = PostLikes::find($post_id);
+
+	$postCreator = $like->user->id;
+
+	if($postCreator == $token->user->getKey())
+	{
+		$post->delete();
+		return CustomJsonResponse("Deleted like with id=".$post_id, true);
+	}
+	else
+		return CustomJsonResponse("Couldn't delete like with id=".$post_id, false);
+})
+)->where('post_id', '[0-9]+');;
+
 /*
 |--------------------------------------------------------------------------
 | Comment Post Routes
