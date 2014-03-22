@@ -13,7 +13,7 @@
 
 function CustomJsonResponse($message, $status)
 {
-	$reponse = array('message' => $message, 
+	$response = array('message' => $message, 
 			         'status' => $status );
 	
 	return Response::json($response);
@@ -310,19 +310,19 @@ Route::delete('/post/like/{like_id}', array('before' => 'token', function($like_
 	$access_token = Request::header('Authorization');
 	$token = Token::where('key', $access_token)->firstOrFail();
 
-	$like = PostLikes::find($post_id);
+	$like = PostLikes::find($like_id);
 
 	$postCreator = $like->user->id;
 
 	if($postCreator == $token->user->getKey())
 	{
-		$post->delete();
-		return CustomJsonResponse("Deleted like with id=".$post_id, true);
+		$like->delete();
+		return CustomJsonResponse("Deleted like with id=".$like_id, true);
 	}
 	else
-		return CustomJsonResponse("Couldn't delete like with id=".$post_id, false);
+		return CustomJsonResponse("Couldn't delete like with id=".$like_id, false);
 })
-)->where('post_id', '[0-9]+');;
+)->where('like_id', '[0-9]+');;
 
 /*
 |--------------------------------------------------------------------------
