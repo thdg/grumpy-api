@@ -13,9 +13,9 @@
 
 function CustomJsonResponse($message, $status)
 {
-	$response = array('message' => $message, 
-			         'status' => $status );
-	
+	$response = array('message' => $message,
+			          'status' => $status );
+
 	return Response::json($response);
 };
 
@@ -141,7 +141,7 @@ Route::post('/user/', function()
 
 		$user = User::create($user_data);
 
-		return CustomJsonResponse('New user created', true);	
+		return CustomJsonResponse('New user created', true);
 	}
 });
 
@@ -182,7 +182,9 @@ Route::put('/user/', array('before' => 'token', function()
 
 	$user->update();
 
-	return CustomJsonResponse('Updated user successfully', true);
+	$response = User::findOrFail($userid);
+
+	return Response::json($response);
 }));
 
 /*
